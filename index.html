@@ -4,127 +4,238 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LCD Custom Character Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        h1 {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #ece9e6, #ffffff);
+            min-height: 100vh;
+            padding: 40px 20px;
             color: #333;
+        }
+
+        h1 {
             text-align: center;
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
+
         .container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        .grid-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+
+        .grid-container, .output-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
         }
+
+        .grid-container:hover, .output-container:hover {
+            transform: translateY(-5px);
+        }
+
         .grid {
             display: grid;
-            grid-template-columns: repeat(8, 30px);
-            grid-template-rows: repeat(8, 30px);
-            gap: 2px;
-            margin-bottom: 15px;
+            gap: 3px;
+            margin: 20px auto;
+            background: #f0f0f0;
+            padding: 5px;
+            border-radius: 8px;
         }
+
         .cell {
-            width: 30px;
-            height: 30px;
-            border: 1px solid #ddd;
+            width: 35px;
+            height: 35px;
+            border: 2px solid #ccc;
+            background: white;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: background 0.2s, transform 0.1s;
         }
+
         .cell.active {
-            background-color: #4CAF50;
+            background: #2196f3;
+            transform: scale(1.1);
         }
+
         .cell:hover {
-            background-color: #e0e0e0;
+            background: #e3f2fd;
         }
+
         .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
             margin-bottom: 20px;
-            text-align: center;
         }
-        button {
-            padding: 8px 15px;
-            margin: 0 5px;
-            background-color: #4CAF50;
-            color: white;
+
+        select, button {
+            padding: 10px 15px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
+            font-size: 1rem;
             cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
         }
-        button:hover {
-            background-color: #45a049;
-        }
-        .output {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            font-family: monospace;
-            white-space: pre;
-        }
+
         select {
-            padding: 8px;
-            margin-right: 10px;
+            background: #f1f1f1;
+            color: #333;
         }
-        .instructions {
-            margin-top: 20px;
+
+        button {
+            background: #2196f3;
+            color: white;
+        }
+
+        button:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+        }
+
+        button i {
+            margin-right: 5px;
+        }
+
+        .output-container h3 {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .output-container h3::after {
+            content: '\f078';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            transition: transform 0.3s;
+        }
+
+        .output-container h3.collapsed::after {
+            transform: rotate(180deg);
+        }
+
+        .output-section {
+            font-family: 'Courier New', Courier, monospace;
+            background: #f9f9f9;
             padding: 15px;
-            background-color: #e9f7ef;
-            border-radius: 8px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+            display: block;
+        }
+
+        .output-section.hidden {
+            display: none;
+        }
+
+        .instructions {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+            background: #e3f2fd;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .instructions h3 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .instructions p {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .grid-container, .output-container {
+                margin-bottom: 20px;
+            }
         }
     </style>
 </head>
 <body>
-   <p><span style="color: blue;">theory</span><span style="color: magenta;">CIRCUIT</span></p>
+     <p><center></center><span style="color: blue;">theory</span><span style="color: magenta;">CIRCUIT</span></center></p>
     <h1>LCD Custom Character Generator</h1>
-        <div class="container">
+    
+    <div class="container">
         <div class="grid-container">
             <div class="controls">
                 <select id="grid-size">
                     <option value="5x8">5x8 pixels</option>
                     <option value="8x8">8x8 pixels</option>
                 </select>
-                <button id="clear-btn">Clear</button>
-                <button id="invert-btn">Invert</button>
-                <button id="random-btn">Random</button>
+                <button id="clear-btn"><i class="fas fa-eraser"></i> Clear</button>
+                <button id="invert-btn"><i class="fas fa-adjust"></i> Invert</button>
+                <button id="random-btn"><i class="fas fa-dice"></i> Random</button>
+                <button id="copy-btn"><i class="fas fa-copy"></i> Copy Hex</button>
+                <button id="download-btn"><i class="fas fa-download"></i> Download</button>
             </div>
-            
             <div class="grid" id="pixel-grid"></div>
-            
-            <div class="controls">
-                <button id="copy-btn">Copy Hex Code</button>
-            </div>
         </div>
         
-        <div class="output">
-            <h3>Hex Code:</h3>
-            <div id="hex-output"></div>
+        <div class="output-container">
+            <h3 id="hex-toggle">Hex Code</h3>
+            <div class="output-section" id="hex-output"></div>
             
-            <h3>C/C++ Array:</h3>
-            <div id="array-output"></div>
+            <h3 id="array-toggle">C/C++ Array</h3>
+            <div class="output-section" id="array-output"></div>
             
-            <h3>Binary Preview:</h3>
-            <div id="binary-output"></div>
+            <h3 id="binary-toggle">Binary Preview</h3>
+            <div class="output-section" id="binary-output"></div>
         </div>
     </div>
     
     <div class="instructions">
-        <h3>Instructions:</h3>
-        <p>1. Click on pixels to toggle them on/off</p>
-        <p>2. Choose between 5x8 or 8x8 grid sizes</p>
-        <p>3. Use the buttons to clear, invert, or randomize your design</p>
-        <p>4. Copy the hexadecimal values for use in your LCD code</p>
+        <h3>Instructions</h3>
+        <p>1. Click pixels to toggle them on/off.</p>
+        <p>2. Select 5x8 or 8x8 grid size for your LCD display.</p>
+        <p>3. Use Clear, Invert, or Random buttons to modify the design.</p>
+        <p>4. Copy the hex code or download the C array for use in your LCD project.</p>
     </div>
+
+    <div class="toast" id="toast">Copied to clipboard!</div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -137,48 +248,41 @@
             const invertBtn = document.getElementById('invert-btn');
             const randomBtn = document.getElementById('random-btn');
             const copyBtn = document.getElementById('copy-btn');
-            
+            const downloadBtn = document.getElementById('download-btn');
+            const toast = document.getElementById('toast');
             let gridSize = '5x8';
             let gridData = [];
-            
+
             // Initialize the grid
             function initGrid() {
                 gridElement.innerHTML = '';
                 const [cols, rows] = gridSize.split('x').map(Number);
-                
-                // Set grid template based on size
-                gridElement.style.gridTemplateColumns = `repeat(${cols}, 30px)`;
-                gridElement.style.gridTemplateRows = `repeat(${rows}, 30px)`;
-                
-                // Initialize grid data
+                gridElement.style.gridTemplateColumns = `repeat(${cols}, 35px)`;
+                gridElement.style.gridTemplateRows = `repeat(${rows}, 35px)`;
                 gridData = Array(rows).fill().map(() => Array(cols).fill(0));
-                
-                // Create cells
+
                 for (let y = 0; y < rows; y++) {
                     for (let x = 0; x < cols; x++) {
                         const cell = document.createElement('div');
                         cell.className = 'cell';
                         cell.dataset.x = x;
                         cell.dataset.y = y;
-                        
                         cell.addEventListener('click', function() {
                             toggleCell(x, y);
                         });
-                        
                         gridElement.appendChild(cell);
                     }
                 }
-                
                 updateOutput();
             }
-            
+
             // Toggle a cell
             function toggleCell(x, y) {
                 gridData[y][x] = gridData[y][x] ? 0 : 1;
                 updateGridDisplay();
                 updateOutput();
             }
-            
+
             // Update the visual grid display
             function updateGridDisplay() {
                 const cells = document.querySelectorAll('.cell');
@@ -188,19 +292,18 @@
                     cell.classList.toggle('active', gridData[y][x] === 1);
                 });
             }
-            
+
             // Update all output displays
             function updateOutput() {
                 updateHexOutput();
                 updateArrayOutput();
                 updateBinaryOutput();
             }
-            
+
             // Generate hexadecimal output
             function updateHexOutput() {
                 const [cols, rows] = gridSize.split('x').map(Number);
                 const bytes = [];
-                
                 for (let y = 0; y < rows; y++) {
                     let byte = 0;
                     for (let x = 0; x < cols; x++) {
@@ -210,16 +313,14 @@
                     }
                     bytes.push(byte);
                 }
-                
                 const hexValues = bytes.map(b => '0x' + b.toString(16).padStart(2, '0').toUpperCase());
                 hexOutput.textContent = hexValues.join(', ');
             }
-            
+
             // Generate C/C++ array output
             function updateArrayOutput() {
                 const [cols, rows] = gridSize.split('x').map(Number);
                 const bytes = [];
-                
                 for (let y = 0; y < rows; y++) {
                     let byte = 0;
                     for (let x = 0; x < cols; x++) {
@@ -229,27 +330,24 @@
                     }
                     bytes.push(byte);
                 }
-                
                 const hexValues = bytes.map(b => '0x' + b.toString(16).padStart(2, '0').toUpperCase());
-                arrayOutput.textContent = `uint8_t customChar[] = {\n    ${hexValues.join(', ')}\n};`;
+                arrayOutput.textContent = `uint8_t customChar[] = {\n    ${hexValues.join(', ')}\n};\n// Use with: lcd.createChar(0, customChar); lcd.write(0);`;
             }
-            
-            // Generate binary preview output
+
+            // Generate binary preview output in the format 0b00000
             function updateBinaryOutput() {
                 const [cols, rows] = gridSize.split('x').map(Number);
                 let binaryText = '';
-                
                 for (let y = 0; y < rows; y++) {
-                    let row = '';
+                    let row = '0b';
                     for (let x = 0; x < cols; x++) {
                         row += gridData[y][x] ? '1' : '0';
                     }
                     binaryText += row + '\n';
                 }
-                
                 binaryOutput.textContent = binaryText;
             }
-            
+
             // Clear the grid
             function clearGrid() {
                 const [cols, rows] = gridSize.split('x').map(Number);
@@ -257,7 +355,7 @@
                 updateGridDisplay();
                 updateOutput();
             }
-            
+
             // Invert the grid
             function invertGrid() {
                 const [cols, rows] = gridSize.split('x').map(Number);
@@ -269,7 +367,7 @@
                 updateGridDisplay();
                 updateOutput();
             }
-            
+
             // Randomize the grid
             function randomizeGrid() {
                 const [cols, rows] = gridSize.split('x').map(Number);
@@ -281,30 +379,49 @@
                 updateGridDisplay();
                 updateOutput();
             }
-            
+
             // Copy hex code to clipboard
             function copyHexCode() {
                 const hexText = hexOutput.textContent;
                 navigator.clipboard.writeText(hexText).then(() => {
-                    const originalText = copyBtn.textContent;
-                    copyBtn.textContent = 'Copied!';
-                    setTimeout(() => {
-                        copyBtn.textContent = originalText;
-                    }, 2000);
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
                 });
             }
-            
+
+            // Download C array as .c file
+            function downloadCode() {
+                const code = arrayOutput.textContent;
+                const blob = new Blob([code], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'custom_char.c';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            // Toggle output sections
+            function toggleOutputSection(event) {
+                const section = event.target.nextElementSibling;
+                section.classList.toggle('hidden');
+                event.target.classList.toggle('collapsed');
+            }
+
             // Event listeners
             gridSizeSelect.addEventListener('change', function() {
                 gridSize = this.value;
                 initGrid();
             });
-            
             clearBtn.addEventListener('click', clearGrid);
             invertBtn.addEventListener('click', invertGrid);
             randomBtn.addEventListener('click', randomizeGrid);
             copyBtn.addEventListener('click', copyHexCode);
-            
+            downloadBtn.addEventListener('click', downloadCode);
+            document.getElementById('hex-toggle').addEventListener('click', toggleOutputSection);
+            document.getElementById('array-toggle').addEventListener('click', toggleOutputSection);
+            document.getElementById('binary-toggle').addEventListener('click', toggleOutputSection);
+
             // Initialize
             initGrid();
         });
